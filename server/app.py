@@ -20,19 +20,34 @@ def index():
 
 @app.route('/bakeries')
 def bakeries():
-    return ''
+    all_bakeries = Bakery.query.all()
+    response = {'bakeries': [bakery.serialize() for bakery in all_bakeries]}
+    return jsonify(response)
 
 @app.route('/bakeries/<int:id>')
 def bakery_by_id(id):
-    return ''
+    bakery = Bakery.query.get(id)
+    if bakery is None:
+        return make_response(jsonify({'error': 'Bakery not found'}), 404)
 
+    response = {'bakery': bakery.serialize()}
+    return jsonify(response)
+
+      
 @app.route('/baked_goods/by_price')
 def baked_goods_by_price():
-    return ''
+    baked_goods = BakedGood.query.order_by(BakedGood.price.desc()).all()
+    response = {'baked_goods': [baked_good.serialize() for baked_good in baked_goods]}
+    return jsonify(response)
 
 @app.route('/baked_goods/most_expensive')
 def most_expensive_baked_good():
-    return ''
+    baked_good = BakedGood.query.order_by(BakedGood.price.desc()).first()
+    if baked_good is None:
+        return make_response(jsonify({'error': 'No baked goods found'}), 404)
+
+    response = {'baked_good': baked_good.serialize()}
+    return jsonify(response)
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
